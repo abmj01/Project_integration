@@ -1,43 +1,230 @@
+#include <Wire.h>
+#include "mpu_algo.h"
 #include "User_input.h"
-#include "Notification_sender.h"
-#include "Battery_monitoring.h"
-#include "OLED_display.h"
-#include "GPS.h"
-#include "Data_base_retriever.h"
+#include "Oled_display.h"
 
-// Declare instances
-OLED_display display;
-Battery_monitoring batteryMonitor(display);
-User_input userButton(2); // Assuming the button is connected to pin 2
-Notification_sender notifier;
-GPS gps;
+#include <esp_task_wdt.h>
+
+// Create an object instance
+User_input user_input;
+mpu_algo mp; 
+Oled_display oled;
+
+#define WDT_TIMEOUT 3
 
 void setup() {
-  Serial.begin(9600);
-  display.initialize_display();
-  userButton.begin();
-  gps.detect_location();
+  Serial.begin(115200);
+
+ esp_task_wdt_config_t wdt_config = {
+    .timeout_ms = WDT_TIMEOUT * 1000, // Convert seconds to milliseconds
+    .trigger_panic = true // Trigger panic (reset) if WDT times out
+  };
+
+  esp_task_wdt_init(&wdt_config); // Initialize the watchdog timer
+  esp_task_wdt_add(NULL); // Add current task (main loop) to the watchdog timer
+
+  user_input.initialize_buttons();
+  oled.initialize_display();
+  mp.initialize_mpu();
 }
 
+
+//set flags
+bool initial_display_flag = true;
+bool user_input_flag = false;
+bool display_alert_sent = false;
+bool exercise_mode_flag = false;
+bool exercise_mode_deactivated_flag = false;
+
+
+// set timers
+unsigned long are_you_ok_start_time = 0ul;
+unsigned long alert_sent_start_time = 0ul;
+unsigned long user_denial_start_time = 0ul;
+unsigned long exercise_mode_start_time = 0ul;
+unsigned long exercise_mode_deactivated_time = 0ul;
+
+
+int x = 0;
+
+
 void loop() {
-  // Handle button input
-  if (userButton.long_press_panic()) {
-    Serial.println("Emergency! Long press detected.");
-    notifier.send_alert_message(gps, 1234567890, "contact@example.com"); // Replace with actual contact info
+
+  // Serial.print("Falldetected inside the beginning of the loop() func: ");
+  // Serial.println(mp.fall_detected);
+  Serial.print("shortPressDetected in the beginng of loop() func: ");
+  Serial.println(user_input.shortPressDetected);
+
+
+  user_input.handle_exercise_button();
+  //  Serial.print("Falldetected after handle_exercise_button() func: ");
+  // Serial.println(mp.fall_detected);
+
+  mp.readFall();
+  Serial.print("shortPressDetected after readFAll() func: ");
+  Serial.println(user_input.shortPressDetected);
+
+
+    // Check if excersice mode button pressed
+   if (user_input.shortPressDetected == true){
+    Serial.println("Exercise button pressed!!");
+    exercise_mode_flag = true;
   }
 
-  if (userButton.deny_emergency_press()) {
-    Serial.println("Emergency denied.");
-    // Add code to cancel the emergency here
+  // check if exercise long press to deactivate the long press is pressed.
+  if((exercise_mode_flag == true) && (user_input.longPressDetected == true)) {
+   exercise_mode_flag = false;
+   exercise_mode_deactivated_flag = true;
   }
 
-  // Monitor and display battery life
-  batteryMonitor.read_battery_life();
-  batteryMonitor.display_battery_life();
+  // to stop the Excersice mode in the beginning
+    if (x == 0){
+   reset_flags_and_timers();
+   x++;
+   }
+
+  if (exercise_mode_flag){
+    handle_exercise_mode();
+  } else if (exercise_mode_deactivated_flag){
+    handle_exercise_mode_deactivation();
+  } else{
+    initial_display();
+    handle_fall_detection();
+    handle_alert_sent();
+    handle_user_input();
+  }
+
+  esp_task_wdt_reset();
   
-  Serial.print("Battery Life: ");
-  Serial.print(batteryMonitor.get_battery_life());
-  Serial.println("%");
 
-  delay(60000); // Update battery life every minute
+}
+
+
+void initial_display() {
+  if (initial_display_flag) {
+    oled.display_string("Initial state", 15, 75);
+    reset_flags_and_timers();
+  }
+}
+
+
+
+void handle_fall_detection() {
+  if (mp.fall_detected) {
+    initial_display_flag = false;
+    display_alert_sent = false;
+    user_input_flag = false;
+
+    oled.display_string("Are you ok?", 6, 75);
+
+
+    if (are_you_ok_start_time == 0) are_you_ok_start_time = millis();
+      
+
+    if ((millis() - are_you_ok_start_time) > 10000ul) {
+      are_you_ok_start_time = 0ul;
+      mp.fall_detected = false;
+      display_alert_sent = true;
+    }
+  }
+}
+
+void handle_alert_sent() 
+{
+
+  if(user_input.long_press_panic()) display_alert_sent = true;
+  
+  if (display_alert_sent ) 
+  {
+    mp.fall_detected = false;
+    initial_display_flag = false;
+    user_input_flag = false;
+    Serial.print(user_input.long_press_panic());
+    if (alert_sent_start_time == 0) alert_sent_start_time = millis();
+      
+
+    oled.display_string("Alert sent!", 15, 75);
+   
+
+    if ((millis() - alert_sent_start_time) > 5000ul) 
+    {
+      initial_display_flag = true;
+      alert_sent_start_time = 0ul;
+      display_alert_sent = false;
+
+    }
+  }
+}
+
+void handle_user_input() {
+  if (user_input.deny_emergency_press() && mp.fall_detected) {
+    user_input_flag = true;
+    display_alert_sent = false;
+    mp.fall_detected = false;
+    initial_display_flag = false;
+  }
+
+  if (user_input_flag) {
+    oled.display_string("Good to hear!", 4, 75);
+
+    if (user_denial_start_time == 0ul) {
+      user_denial_start_time = millis();
+    }
+
+    if ((millis() - user_denial_start_time) > 3000ul) {
+      initial_display_flag = true;
+      user_denial_start_time = 0ul;
+      reset_flags_and_timers(); 
+    }
+  }
+}
+
+
+
+
+
+void handle_exercise_mode(){
+
+   oled.display_long_string("Exercise", "Mode", 30, 75, 40, 95);
+
+   mp.exercise_mode_fall_detection();
+
+   if(exercise_mode_start_time == 0) exercise_mode_start_time = millis();
+  
+   
+   if((millis() - exercise_mode_start_time) > 600000ul){
+    exercise_mode_flag = false;
+    exercise_mode_deactivated_flag = true;
+   }
+  
+}
+
+
+void handle_exercise_mode_deactivation(){
+
+  oled.display_long_string("Exercise", "Deactivated", 30, 75, 10, 95);
+
+  if (exercise_mode_deactivated_time == 0) exercise_mode_deactivated_time = millis();
+
+  if((millis() - exercise_mode_deactivated_time) > 2000ul){
+    exercise_mode_deactivated_flag = false;
+    initial_display_flag = true;
+    reset_flags_and_timers();
+  }
+ 
+}
+
+
+void reset_flags_and_timers() {
+  are_you_ok_start_time = 0ul;
+  alert_sent_start_time = 0ul;
+  user_denial_start_time = 0ul;
+  exercise_mode_start_time = 0ul;
+  exercise_mode_deactivated_time = 0ul;
+
+
+  exercise_mode_flag = false;
+  exercise_mode_deactivated_flag = false;
+  display_alert_sent = false;
+  user_input_flag = false;
 }

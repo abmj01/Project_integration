@@ -1,40 +1,83 @@
 #include "User_input.h"
 
-// Constructor to initialize the pin
-User_input::User_input(int pin) {
-  _pin = pin;
-  _pressStartTime = 0;
-  _isLongPress = false;
+ User_input::User_input() 
+ {
+
+ }        
+
+
+ void User_input::initialize_buttons(){
+  pinMode(deny_button, INPUT_PULLUP);  // use ESP internal pull up resistor
+  pinMode(panic_button, INPUT_PULLUP);  
+  pinMode(exercise_button, INPUT_PULLUP);  
+
 }
 
-// Method to initialize the pin mode
-void User_input::begin() {
-  pinMode(_pin, INPUT);
-}
+ 
 
-// Method to detect a long press (panic button)
 bool User_input::long_press_panic() {
-  if (digitalRead(_pin) == HIGH) {
-    if (_pressStartTime == 0) {
-      _pressStartTime = millis();
-    }
-    if (millis() - _pressStartTime > 2000) { // Long press duration 2 seconds
-      _isLongPress = true;
-    }
-  } else {
-    _pressStartTime = 0;
-    _isLongPress = false;
+   
+  currentState = digitalRead(panic_button); // Read the state of the switch/button
+
+  if (lastState == HIGH && currentState == LOW) 
+  { // Button is pressed
+    pressedTime = millis();
+    isPressing = true;
+    isLongDetected = false;
+  } else if (lastState == LOW && currentState == HIGH) 
+  { // Button is released
+    isPressing = false;
   }
-  return _isLongPress;
+
+  if (isPressing && !isLongDetected) 
+  {
+    long pressDuration = millis() - pressedTime;
+
+    if (pressDuration > LONG_PRESS_TIME) {
+      isLongDetected = true;
+    }
+  } else{
+    isLongDetected = false;
+  }
+
+  lastState = currentState; // Save the last state
+
+  return isLongDetected;
 }
 
-// Method to detect a short press (deny emergency)
-bool User_input::deny_emergency_press() {
-  if (digitalRead(_pin) == HIGH && !_isLongPress) {
-    delay(50); // Debounce delay
-    if (digitalRead(_pin) == HIGH) {
-      return true;
-    }
+
+
+ bool User_input::deny_emergency_press(){
+   return digitalRead(deny_button) == LOW;
+ }
+
+
+void User_input::handle_exercise_button() {
+  Serial.print("shortPressDetected inside handle_exercise_button() func: ");
+  Serial.println(shortPressDetected);
+
+  int reading = digitalRead(exercise_button);
+
+  shortPressDetected = false;
+  longPressDetected = false;
+
+  if (reading == LOW && ex_previousState == HIGH) { // Button was just pressed
+    ex_pressedTime = millis();
   }
-  return false;
+
+  if (reading == LOW && (millis() - ex_pressedTime >= 1500ul)) { // Button is being held
+    if (!ex_isLongDetected) {
+      Serial.println("Exercise long press detected");
+      ex_isLongDetected = true;
+      longPressDetected = true; // Indicate a long press
+    }
+  } else if (reading == HIGH && ex_previousState == LOW) { // Button was released
+    if (millis() - ex_pressedTime < 1500ul) { // Short press detected
+      Serial.println("Exercise short press detected");
+      shortPressDetected = true; // Indicate a short press
+    }
+    ex_isLongDetected = false; // Reset the long press flag
+  }
+
+  ex_previousState = reading; // Save the last state
 }

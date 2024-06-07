@@ -1,19 +1,19 @@
 #ifndef OLED_DISPLAY_H
 #define OLED_DISPLAY_H
 
-#include <Adafruit_SSD1306.h>
-#include <Adafruit_GFX.h>
+// #include <Wire.h>
+#include <U8g2lib.h> 
+
+//U8G2_SH1107_PIMORONI_128X128_2_HW_I2C u8g2;
+U8G2_SH1107_PIMORONI_128X128_F_HW_I2C u8g2(U8G2_R0);
 
 
-#define OLED_ADDR 0x3C     // OLED display TWI address
-Adafruit_SSD1306 display(-1);
-
-#if (SSD1306_LCDHEIGHT != 64)
-#error("Height incorrect, please fix Adafruit_SSD1306.h!");
-#endif
 
 class Oled_display{
  private:
+ 
+
+ //U8G2_SH1107_PIMORONI_128X128_F_HW_I2C u8g2;
 
  public:
 
@@ -21,9 +21,9 @@ class Oled_display{
 
  void initialize_display();
 
- void clear_display();
+ void display_string(const char* str, int x, int y);
 
- void display_string(const String &str);
+ void display_long_string(const char* str1, const char* str2, int x1, int y1, int x2, int y2);
 
 };
 
