@@ -19,7 +19,7 @@ class Notification_sender{
 
   WiFiClient client;
 
-  char* full_name = "";
+  String full_name = "";
 
   
   Notification_sender();     //constructor
