@@ -1,20 +1,34 @@
 #ifndef NOTIFICATION_SENDER_H
 #define NOTIFICATION_SENDER_H
 
-#include "GPS.h"
-#include "Data_base_retriever.h"
+#include <WiFi.h>
 
-// Notification_sender class handles sending alert messages
-class Notification_sender {
-  public:
-    Notification_sender();  // Constructor
-    void send_alert_message(GPS gps, int contact_person_num, String contact_person_email);  // Method to send alert message
+
+const char* ssid = "K9";                           //hardcoded
+const char* password = "saifceo20";                // hardcoded
+const char* serverAddress = "192.168.164.235";  // Raspberry Pi's IP address hardcoded
+const int serverPort = 8080;                   // Servers Port Number  hardcoded
+const char* watch_code = "2114";
+
+
+class Notification_sender{
 
   private:
-    int contact_person_num;  // Contact person's phone number
-    String contact_person_email;  // Contact person's email address
-    GPS gps_obj;  // GPS object to get location data
-    Data_base_retriever fetched_data_obj;  // Data base retriever object to fetch contact info
+
+  public:
+
+  char* full_name = "";
+
+  
+  Notification_sender();     //constructor
+
+  void initialize_WiFi();
+
+  void connect_to_server();     // also send the watch_code to the server in this function
+
+  void send_notification_to_contact_person();   //Send ->  "The user " + full_name + " has had a siegure in " + "coordinates: Longitude: " longitude + " " + "Latitude: " latitude
+
+
 };
 
-#endif // NOTIFICATION_SENDER_H
+#endif
