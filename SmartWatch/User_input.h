@@ -41,11 +41,7 @@ class User_input{
 
  bool deny_emergency_press();         // Function to let the user deny an emergency fall by pressing the deny button
 
-//  bool exercise_mode_pressed();        // Function to detect if the exercise button is pressed
-
-//  bool long_press_exercise_cancel();  //Function to detect if a long press on the exercise button has been pressed to deactivate the excercise mode
-
-  void handle_exercise_button();
+void handle_exercise_button();        // Function to handle if short press oor long press detected for the exercise mode button
 };
 
 

@@ -2,15 +2,23 @@
 #include "mpu_algo.h"
 #include "User_input.h"
 #include "Oled_display.h"
-
 #include <esp_task_wdt.h>
+
 
 // Create an object instance
 User_input user_input;
 mpu_algo mp; 
 Oled_display oled;
 
+
+// Task Function declarations
+void readMPUTask(void *pvParameters);
+void handleUserInputTask(void *pvParameters);
+void updateDisplayTask(void *pvParameters);
+
+
 #define WDT_TIMEOUT 3
+
 
 void setup() {
   Serial.begin(115200);
@@ -26,6 +34,11 @@ void setup() {
   user_input.initialize_buttons();
   oled.initialize_display();
   mp.initialize_mpu();
+
+ // Create FreeRTOS tasks
+  xTaskCreate(handleExerciseButtonTask, "ExerciseButtonTask", 8000, NULL, 1, NULL);
+  xTaskCreate(handleFallDetectionTask, "FallDetectionTask", 4096, NULL, 2, NULL);
+  xTaskCreate(handleDisplayTask, "DisplayTask", 8000, NULL, 2, NULL);
 }
 
 
@@ -50,54 +63,89 @@ int x = 0;
 
 void loop() {
 
-  // Serial.print("Falldetected inside the beginning of the loop() func: ");
-  // Serial.println(mp.fall_detected);
-  Serial.print("shortPressDetected in the beginng of loop() func: ");
-  Serial.println(user_input.shortPressDetected);
+  esp_task_wdt_reset();
+
+}
 
 
-  user_input.handle_exercise_button();
-  //  Serial.print("Falldetected after handle_exercise_button() func: ");
-  // Serial.println(mp.fall_detected);
+// Task for handling exercise button
+void handleExerciseButtonTask(void * parameter) {
 
-  mp.readFall();
-  Serial.print("shortPressDetected after readFAll() func: ");
-  Serial.println(user_input.shortPressDetected);
+  UBaseType_t uxHighWaterMark;
+  uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+  while(true) {
+    user_input.handle_exercise_button();
+    check_exercise_mode();
+    check_exercise_mode_cancel();
+      // to stop the Excersice mode in the beginning
+    if (x == 0){
+    reset_flags_and_timers();
+    x++;
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 10ms
+
+   uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+  }
+}
 
 
-    // Check if excersice mode button pressed
+// Task for handling fall detection
+void handleFallDetectionTask(void * parameter) {
+  UBaseType_t uxHighWaterMark;
+  uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+  while(true) {
+    mp.readFall();
+    vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 100ms
+    uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+  }
+}
+
+
+// Task for handling OLED display updates
+void handleDisplayTask(void * parameter) {
+  UBaseType_t uxHighWaterMark;
+  uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+  while(true) {
+    if (exercise_mode_flag) {
+      handle_exercise_mode();
+    } else if (exercise_mode_deactivated_flag) {
+      handle_exercise_mode_deactivation();
+    } else {
+       initial_display();
+       handle_fall_detection();
+       handle_alert_sent();
+       handle_user_input();
+    }
+    vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 100ms
+    uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+  }
+}
+
+
+
+
+
+
+
+
+void check_exercise_mode(){
+     // Check if excersice mode button pressed
    if (user_input.shortPressDetected == true){
     Serial.println("Exercise button pressed!!");
     exercise_mode_flag = true;
   }
+}
 
+void check_exercise_mode_cancel(){
   // check if exercise long press to deactivate the long press is pressed.
   if((exercise_mode_flag == true) && (user_input.longPressDetected == true)) {
    exercise_mode_flag = false;
    exercise_mode_deactivated_flag = true;
   }
 
-  // to stop the Excersice mode in the beginning
-    if (x == 0){
-   reset_flags_and_timers();
-   x++;
-   }
-
-  if (exercise_mode_flag){
-    handle_exercise_mode();
-  } else if (exercise_mode_deactivated_flag){
-    handle_exercise_mode_deactivation();
-  } else{
-    initial_display();
-    handle_fall_detection();
-    handle_alert_sent();
-    handle_user_input();
-  }
-
-  esp_task_wdt_reset();
-  
-
 }
+
 
 
 void initial_display() {
