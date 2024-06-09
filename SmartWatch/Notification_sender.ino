@@ -1,7 +1,7 @@
 #include "Notification_sender.h"
 
-const char* ssid = "DIGI-bE5h";                           //hardcoded
-const char* password = "5zVGwK92";                // hardcoded
+// const char* ssid = "DIGI-bE5h";                           //hardcoded
+// const char* password = "5zVGwK92";                // hardcoded
 const char* serverAddress = "192.168.100.227";     // Raspberry Pi's IP address hardcoded
 const int serverPort = 8080;                       // Servers Port Number  hardcoded
 const char* watch_code = "2580";

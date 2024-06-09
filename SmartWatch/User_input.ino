@@ -53,8 +53,6 @@ bool User_input::long_press_panic() {
 
 
 void User_input::handle_exercise_button() {
-  Serial.print("shortPressDetected inside handle_exercise_button() func: ");
-  Serial.println(shortPressDetected);
 
   int reading = digitalRead(exercise_button);
 

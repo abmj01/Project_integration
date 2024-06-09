@@ -1,4 +1,6 @@
 #include <Wire.h>
+#include <WiFi.h>
+#include <time.h>
 #include "mpu_algo.h"
 #include "User_input.h"
 #include "Oled_display.h"
@@ -15,13 +17,27 @@ Oled_display oled;
 void readMPUTask(void *pvParameters);
 void handleUserInputTask(void *pvParameters);
 void updateDisplayTask(void *pvParameters);
-
+void getCurrentTimeTask(void *pvParameters);
 
 #define WDT_TIMEOUT 3
+
+const char* ssid = "TMNL-5A0F21";
+const char* password = "2043119Ggg";
 
 
 void setup() {
   Serial.begin(115200);
+
+  //connect to wifi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("Connected!");
+
+  oled.initialize_ntp();
 
  esp_task_wdt_config_t wdt_config = {
     .timeout_ms = WDT_TIMEOUT * 1000, // Convert seconds to milliseconds
@@ -36,9 +52,11 @@ void setup() {
   mp.initialize_mpu();
 
  // Create FreeRTOS tasks
-  xTaskCreate(handleExerciseButtonTask, "ExerciseButtonTask", 8000, NULL, 1, NULL);
+  xTaskCreate(handleExerciseButtonTask, "ExerciseButtonTask", 8000, NULL, 2, NULL);
   xTaskCreate(handleFallDetectionTask, "FallDetectionTask", 4096, NULL, 2, NULL);
-  xTaskCreate(handleDisplayTask, "DisplayTask", 8000, NULL, 2, NULL);
+  xTaskCreate(handleDisplayTask, "DisplayTask", 8000, NULL, 1, NULL);
+  xTaskCreate(getCurrentTimeTask, "GetCurrentTime", 2000, NULL, 1, NULL);
+
 }
 
 
@@ -83,7 +101,7 @@ void handleExerciseButtonTask(void * parameter) {
     x++;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 10ms
+    vTaskDelay(pdMS_TO_TICKS(10)); 
 
    uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
   }
@@ -96,7 +114,7 @@ void handleFallDetectionTask(void * parameter) {
   uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
   while(true) {
     mp.readFall();
-    vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 100ms
+    vTaskDelay(pdMS_TO_TICKS(50)); // Delay for 100ms
     uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
   }
 }
@@ -114,12 +132,26 @@ void handleDisplayTask(void * parameter) {
     } else {
        initial_display();
        handle_fall_detection();
-       handle_alert_sent();
        handle_user_input();
     }
+    handle_alert_sent();
     vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 100ms
     uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
   }
+}
+
+void getCurrentTimeTask(void *pvParameters){
+UBaseType_t uxHighWaterMark;
+  uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+  while(true) {
+
+  oled.get_local_time();
+
+  vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for 100ms
+  uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+}
+  
+
 }
 
 
@@ -177,6 +209,7 @@ void handle_fall_detection() {
   }
 }
 
+
 void handle_alert_sent() 
 {
 
@@ -184,6 +217,8 @@ void handle_alert_sent()
   
   if (display_alert_sent ) 
   {
+    exercise_mode_deactivated_flag = false;
+    exercise_mode_flag = false;
     mp.fall_detected = false;
     initial_display_flag = false;
     user_input_flag = false;
@@ -197,9 +232,7 @@ void handle_alert_sent()
     if ((millis() - alert_sent_start_time) > 5000ul) 
     {
       initial_display_flag = true;
-      alert_sent_start_time = 0ul;
-      display_alert_sent = false;
-
+      reset_flags_and_timers();
     }
   }
 }
@@ -226,8 +259,6 @@ void handle_user_input() {
     }
   }
 }
-
-
 
 
 
