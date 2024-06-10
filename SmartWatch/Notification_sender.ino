@@ -25,15 +25,18 @@ void Notification_sender::initialize_WiFi() {
 
 // Method to connect to the server and send the initial message
 void Notification_sender::connect_to_server() {
+    Serial.print("*");
+
     if (!client.connect(serverAddress, serverPort)) {
         Serial.println("Failed to connect to server!");
         delay(100);
         return;
     }
-
+    
     client.print(String("0 ") + watch_code);
     full_name = waitForServerResponse();
     Serial.println("Watch code sent to server, name associated: " + full_name);
+  
 }
 
 // Method to send notification to the contact person

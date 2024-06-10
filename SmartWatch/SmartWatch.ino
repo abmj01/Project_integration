@@ -5,12 +5,16 @@
 #include "User_input.h"
 #include "Oled_display.h"
 #include <esp_task_wdt.h>
+#include "Notification_sender.h"
+#include "Notify_user.h"
 
 
 // Create an object instance
 User_input user_input;
 mpu_algo mp; 
 Oled_display oled;
+Notification_sender n_s;
+Notify_user notify;
 
 
 // Task Function declarations
@@ -29,15 +33,20 @@ void setup() {
   Serial.begin(115200);
 
   //connect to wifi
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("Connected!");
+  // WiFi.begin(ssid, password);
+  // Serial.print("Connecting to WiFi");
+  // while (WiFi.status() != WL_CONNECTED) {
+  //   delay(500);
+  //   Serial.print(".");
+  // }
+  // Serial.println("Connected!");
+  n_s.initialize_WiFi();
 
-  oled.initialize_ntp();
+  // while(n_s.full_name == ""){
+  //   n_s.connect_to_server();
+  // }
+
+  oled.initialize_ntp();        //ntp for curennt date and time
 
  esp_task_wdt_config_t wdt_config = {
     .timeout_ms = WDT_TIMEOUT * 1000, // Convert seconds to milliseconds
@@ -133,6 +142,7 @@ void handleDisplayTask(void * parameter) {
        initial_display();
        handle_fall_detection();
        handle_user_input();
+       notify.buzzer_loop();
     }
     handle_alert_sent();
     vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 100ms
@@ -153,12 +163,6 @@ UBaseType_t uxHighWaterMark;
   
 
 }
-
-
-
-
-
-
 
 
 void check_exercise_mode(){
@@ -197,6 +201,8 @@ void handle_fall_detection() {
 
     oled.display_string("Are you ok?", 6, 75);
 
+    notify.start_buzzer();
+
 
     if (are_you_ok_start_time == 0) are_you_ok_start_time = millis();
       
@@ -215,13 +221,14 @@ void handle_alert_sent()
 
   if(user_input.long_press_panic()) display_alert_sent = true;
   
-  if (display_alert_sent ) 
+  if (display_alert_sent) 
   {
     exercise_mode_deactivated_flag = false;
     exercise_mode_flag = false;
     mp.fall_detected = false;
     initial_display_flag = false;
     user_input_flag = false;
+    notify.stop_buzzer();
     Serial.print(user_input.long_press_panic());
     if (alert_sent_start_time == 0) alert_sent_start_time = millis();
       
@@ -230,12 +237,14 @@ void handle_alert_sent()
    
 
     if ((millis() - alert_sent_start_time) > 5000ul) 
-    {
+    { 
+      n_s.send_notification_to_contact_person(123784, 313123);
       initial_display_flag = true;
       reset_flags_and_timers();
     }
   }
 }
+
 
 void handle_user_input() {
   if (user_input.deny_emergency_press() && mp.fall_detected) {
@@ -243,6 +252,7 @@ void handle_user_input() {
     display_alert_sent = false;
     mp.fall_detected = false;
     initial_display_flag = false;
+    notify.stop_buzzer();
   }
 
   if (user_input_flag) {
