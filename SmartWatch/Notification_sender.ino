@@ -1,5 +1,15 @@
 #include "Notification_sender.h"
 
+<<<<<<< Updated upstream
+=======
+// Definition of external variables
+extern const char* ssid;
+extern const char* password;
+const char* serverAddress = "192.168.100.227"; // Raspberry Pi's IP address hardcoded
+const int serverPort = 8080; // Server's Port Number hardcoded
+const char* watch_code = "2580";
+
+>>>>>>> Stashed changes
 // Constructor
 // Initializes the Notification_sender object.
 // Currently, the constructor does not perform any specific initialization.
