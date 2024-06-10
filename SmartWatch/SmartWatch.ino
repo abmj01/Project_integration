@@ -7,6 +7,8 @@
 #include <esp_task_wdt.h>
 #include "Notification_sender.h"
 #include "Notify_user.h"
+#include "Battery_monitoring.h"
+
 
 
 // Create an object instance
@@ -15,6 +17,7 @@ mpu_algo mp;
 Oled_display oled;
 Notification_sender n_s;
 Notify_user notify;
+Battery_monitoring battery(34);
 
 
 // Task Function declarations
@@ -22,6 +25,7 @@ void readMPUTask(void *pvParameters);
 void handleUserInputTask(void *pvParameters);
 void updateDisplayTask(void *pvParameters);
 void getCurrentTimeTask(void *pvParameters);
+// void readBatteryTask(void *pvParameters);
 
 #define WDT_TIMEOUT 3
 
@@ -65,6 +69,7 @@ void setup() {
   xTaskCreate(handleFallDetectionTask, "FallDetectionTask", 4096, NULL, 2, NULL);
   xTaskCreate(handleDisplayTask, "DisplayTask", 8000, NULL, 1, NULL);
   xTaskCreate(getCurrentTimeTask, "GetCurrentTime", 2000, NULL, 1, NULL);
+  // xTaskCreate(readBatteryTask, "readBatteryTask", 400, NULL, 1, NULL);
 
 }
 
@@ -134,6 +139,9 @@ void handleDisplayTask(void * parameter) {
   UBaseType_t uxHighWaterMark;
   uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
   while(true) {
+    battery.readBattery();
+    oled.display_battery_status(battery.getBatteryVoltage(), battery.getBatteryPercentage());
+    
     if (exercise_mode_flag) {
       handle_exercise_mode();
     } else if (exercise_mode_deactivated_flag) {
@@ -144,7 +152,9 @@ void handleDisplayTask(void * parameter) {
        handle_user_input();
        notify.buzzer_loop();
     }
+
     handle_alert_sent();
+  
     vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 100ms
     uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
   }
@@ -163,6 +173,17 @@ UBaseType_t uxHighWaterMark;
   
 
 }
+
+// // Task for handling fall detection
+// void readBatteryTask(void * parameter) {
+//   UBaseType_t uxHighWaterMark;
+//   uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+//   while(true) {
+//     battery.readBattery();
+//     vTaskDelay(pdMS_TO_TICKS(3000)); 
+//     uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+//   }
+// }
 
 
 void check_exercise_mode(){
