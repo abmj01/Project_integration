@@ -35,20 +35,12 @@ const char* password = "2043119Ggg";
 
 void setup() {
   Serial.begin(115200);
-
-  //connect to wifi
-  // WiFi.begin(ssid, password);
-  // Serial.print("Connecting to WiFi");
-  // while (WiFi.status() != WL_CONNECTED) {
-  //   delay(500);
-  //   Serial.print(".");
-  // }
-  // Serial.println("Connected!");
+  
   n_s.initialize_WiFi();
 
-  while(n_s.full_name == ""){
-    n_s.connect_to_server();
-  }
+  // while(n_s.full_name == ""){
+  //   n_s.connect_to_server();
+  // }
 
   oled.initialize_ntp();        //ntp for curennt date and time
 
