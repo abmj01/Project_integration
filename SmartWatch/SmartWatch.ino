@@ -46,9 +46,9 @@ void setup() {
   // Serial.println("Connected!");
   n_s.initialize_WiFi();
 
-  // while(n_s.full_name == ""){
-  //   n_s.connect_to_server();
-  // }
+  while(n_s.full_name == ""){
+    n_s.connect_to_server();
+  }
 
   oled.initialize_ntp();        //ntp for curennt date and time
 
