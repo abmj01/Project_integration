@@ -51,6 +51,13 @@ void readBatteryTask(void *pvParameters);
 
 #define WDT_TIMEOUT 3
 
+<<<<<<< Updated upstream
+=======
+const char* ssid = "TP-Link_36A6";
+const char* password = "44423315";
+
+
+>>>>>>> Stashed changes
 void setup() {
   Serial.begin(115200);
 

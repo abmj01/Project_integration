@@ -10,69 +10,52 @@ bool GPS::available() {
     return gpsSerial.available();
 }
 
-String GPS::readData() {
-    String data = "";
+void GPS::readData() {
     while (gpsSerial.available()) {
-        char c = gpsSerial.read();
-        data += c;
+        gps.encode(gpsSerial.read());
     }
-
-    latitude = parseData(data, "GPGGA", 2);
-    longitude = parseData(data, "GPGGA", 4);
-    altitude = parseData(data, "GPGGA", 9);
-    speed = parseData(data, "GPVTG", 7);
-    course = parseData(data, "GPVTG", 1);
-    time = parseData(data, "GPRMC", 1);
-    date = parseData(data, "GPRMC", 9);
-
-    return data;
 }
 
-float GPS::getLatitude() {
-    return parseFloat(latitude);
+int GPS::getSatellites() {
+    return gps.satellites.value();
 }
 
-float GPS::getLongitude() {
-    return parseFloat(longitude);
+double GPS::getLatitude() {
+    return gps.location.lat();
 }
 
-float GPS::getAltitude() {
-    return parseFloat(altitude);
+double GPS::getLongitude() {
+    return gps.location.lng();
 }
 
-float GPS::getSpeed() {
-    return parseFloat(speed);
+double GPS::getAltitude() {
+    return gps.altitude.meters();
 }
 
-float GPS::getCourse() {
-    return parseFloat(course);
+double GPS::getSpeed() {
+    return gps.speed.mps();
 }
 
-String GPS::getTime() {
-    return time;
+int GPS::getYear() {
+    return gps.date.year();
 }
 
-String GPS::getDate() {
-    return date;
+int GPS::getMonth() {
+    return gps.date.month();
 }
 
-String GPS::parseData(String data, String identifier, int field) {
-    int startIndex = data.indexOf(identifier);
-    if (startIndex == -1) return "";
-
-    int endIndex = data.indexOf('\n', startIndex);
-    String line = data.substring(startIndex, endIndex);
-    int commas = 0;
-    for (int i = 0; i < line.length(); i++) {
-        if (line[i] == ',') commas++;
-        if (commas == field) {
-            int nextComma = line.indexOf(',', i + 1);
-            return line.substring(i + 1, nextComma);
-        }
-    }
-    return "";
+int GPS::getDay() {
+    return gps.date.day();
 }
 
-float GPS::parseFloat(String data) {
-    return data.toFloat();
+int GPS::getHour() {
+    return gps.time.hour();
+}
+
+int GPS::getMinute() {
+    return gps.time.minute();
+}
+
+int GPS::getSecond() {
+    return gps.time.second();
 }

@@ -1,27 +1,30 @@
 #ifndef GPS_H
 #define GPS_H
 
-#include <Arduino.h>
+#include <TinyGPS++.h>
+#include <HardwareSerial.h>
 
 class GPS {
 public:
     GPS(HardwareSerial &serial);
     void begin(long baudRate);
     bool available();
-    String readData();
-    float getLatitude();
-    float getLongitude();
-    float getAltitude();
-    float getSpeed();
-    float getCourse();
-    String getTime();
-    String getDate();
+    void readData();
+    int getSatellites();
+    double getLatitude();
+    double getLongitude();
+    double getAltitude();
+    double getSpeed();
+    int getYear();
+    int getMonth();
+    int getDay();
+    int getHour();
+    int getMinute();
+    int getSecond();
     
 private:
     HardwareSerial &gpsSerial;
-    String parseData(String data, String identifier, int field);
-    float parseFloat(String data, String identifier);
-    String latitude, longitude, altitude, speed, course, time, date;
+    TinyGPSPlus gps;
 };
 
 #endif
