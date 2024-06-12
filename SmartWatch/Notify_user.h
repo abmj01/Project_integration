@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 
-#define buzzer_pin 25 // Change to a valid GPIO pin for output
+#define buzzer_pin 33 // pin 14 in pcb not available in TTGO module
 
 class Notify_user {
 private:

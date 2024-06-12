@@ -3,9 +3,9 @@
 
 #include <Arduino.h>
 
-#define panic_button 15     // Analog Button for the deny
-#define deny_button 2    // Analog Button for the deny
-#define exercise_button 32      // Analog Button for the deny
+#define panic_button 25     // Analog Button for the deny
+#define deny_button 26   // Analog Button for the deny
+#define exercise_button 27      // Analog Button for the deny
 
 class User_input{
  private:

@@ -291,6 +291,10 @@ void handle_exercise_mode(){
 
    mp.exercise_mode_fall_detection();
 
+   notify.stop_buzzer();
+
+   mp.fall_detected = false;
+
    if(exercise_mode_start_time == 0) exercise_mode_start_time = millis();
   
    

@@ -19,6 +19,8 @@ class mpu_algo{
   
  mpu_algo();
 
+ const char* temperature;
+
  bool fall_detected = false;  //flag for fall detection
 
  void initialize_mpu();                  // initialize the mpu6050

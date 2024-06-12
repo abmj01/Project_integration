@@ -29,6 +29,10 @@
   // calculate amplitude vector for axis
   double acceleration_magnitude = sqrt(pow(a.acceleration.x, 2) + pow(a.acceleration.y, 2) + pow(a.acceleration.z, 2)); // m/s
 
+  String temperatureStr = String(temp.temperature, 2); // Convert to string with 2 decimal places
+  temperature = temperatureStr.c_str(); // Get char* from string
+
+
   // double gyro_magnitude = sqrt(pow(g.gyro.x, 2) + pow(g.gyro.y, 2) + pow(g.gyro.z, 2));
   
 
