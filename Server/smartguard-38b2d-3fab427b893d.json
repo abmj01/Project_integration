@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "smartguard-38b2d",
+  "private_key_id": "3fab427b893d3ae2c78a385b31967d35821e5fef",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDtF0Dl6r7zE/g3\nmarqEgNTeaE9HMU4zta12j4lOJhYAORChhV7pJO4eO9ysj539pGzBOTaJj9W1e1F\nWAYucQt8mB4BnFp47xNYs6wisyybHg+1LSsG7SoHny7pPu50uUwkT9czXSdnomn6\nkwQk3Kd2m0TT4T4kx2bfM5s2tn4bgHyfUgEg1p/UBXI4MC2gV3vnhGahOQxALKxg\nJ0QiMGsBPWSG9lWdgv7nHQbOQ/aAf/f+0WYgKHfxZNlK9UJsZkKnbLKVj5m5kz8j\nxUzcCI3Y1JS8uyNu9gciqaK21T0NkS8CJsv11qortT6HTG1fdTTlKYTwQfEjur1I\nKasGtPA5AgMBAAECggEAC7Kdg5qI8FJYaVneGm1oF5rFL1A3lN1zr4ZEka6Qqarl\nmDioX7DXjv78hXKw7VdPif8gUXkYn+6vJcA5kdoHAI86z8aImjXlhPdcc1vWxBKA\nIObJHC7gZ37doCl4N28bCCGeUwzyEEVtqCzPxAfVBV+UzkVrPQJPm4yeyFzJrQ6a\nBND7AAXUIARWgDSoEaIgKy8QEm9onkvenAFDx083k1iOSvlvrEvgnQP2JIgaY2WU\na+TfIexuGrfVmYvZs3XU8zSvBzT8WP37lvThTy8w5a5vdIPVI5vIU2M9PGrnKwlD\n32G83QsAU8s7ZJDRi+ImM3GmhzgA/8FW5QjmyAyCtwKBgQD+QAzG5Or3+CdhjhGW\nhrecgRY2GdgWqkR19NzF02nadKFi7R07MeogLnXlKqZ6nmnhXpVKlA6MzHmgV1oX\n/JVlFORouG/kmB+3RfgwICM5WMRFK2NxCc4OtFDPmHe80MoeGwz+JB8I2mWcc45D\nMi0DNF9TzhSl4CXwaJHzrBQdgwKBgQDuuPiu+MHhlj1EXB+ZBE/ix6yEQKQNeqIx\ncPYxd1npS49T78UuE2+hBA624Jjb1rArfVYxQaLDgd7i3MToszo/3EUNve3nkICW\nZi0L8c+1u4jWjvv3AGrBq7MR7bQbfzUfBe3iV4b9Xs4YIyobFCtUXDUJH3FnT0WT\n4U+bGAWqkwKBgQD7h9ocGvTqhTJQrQBxbq3Pw1V6CG9jXOeF2s1fWRxr5t6SxAob\nOfJqDAzOvzccMASH1c7UjU0ntlLNch3LhTM3YUfm4jCwcl9OLYav9dtjLJJf6+Dh\nP9X/bhxUhH5Q6i5LQm/ELXAWjhnggeHIUKd/eBynCEYdJHfkM0/RRfhQiQKBgQCg\nPlnwWdsLaqZFtPEg7dwSBqavQBTfV2p4dbNNESixiZ70YQajHzjXhLm72JfDOiGX\nj9LDzaNMSWksL7Wd3nFDXMCdsNh5kG5AhuXGFtOu0evQ2roX25fN2UuixUUZEBLA\neGJuhQKAIZuGaFRjSO6s+hg/v3OIPZYe5idhnIZxMQKBgHw8AxwGfZcjrHsUJjgF\nCUMpoZwKtpcD48eVkBnyhdtmGfDXcqsklGl6cIDeG5mNY+ujfSw/K/9hV3KDpaAc\neqlVPtbp1mEPp9V1/ROPLByclZbSeUVwwFiw1UE66YR9SEi3m95QZ8RCYzmgbY+b\nKkkRw4Gp0WzkWiBkBaivEScB\n-----END PRIVATE KEY-----\n",
+  "client_email": "smartguard-123@smartguard-38b2d.iam.gserviceaccount.com",
+  "client_id": "115877365085178818967",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/smartguard-123%40smartguard-38b2d.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
