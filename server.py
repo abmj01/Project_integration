@@ -13,9 +13,9 @@ HOST = '0.0.0.0'  # Use '0.0.0.0' to accept connections from any IP address
 PORT = 8080
 
 # Twilio credentials
-account_sid = 'AC27dff6c2f67920e8ed27b4a69838a2e0'
-auth_token = 'e324de9a7f08800c023abe64af695fdf'
-twilio_phone_number = '+17608560477'
+account_sid = '*'
+auth_token = '*'
+twilio_phone_number = '*'
 
 # Initialize Twilio client
 twilio_client = Client(account_sid, auth_token)

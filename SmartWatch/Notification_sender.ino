@@ -1,10 +1,10 @@
 #include "Notification_sender.h"
 
-const char* ssid = "Ziggo6413000";                           //hardcoded
-const char* password = "Pyzcnm3ynmjdu7kp";                // hardcoded
-const char* serverAddress = "192.168.178.121";     // Raspberry Pi's IP address hardcoded
+const char* ssid = "*";                           //hardcoded
+const char* password = "*";                // hardcoded
+const char* serverAddress = "*";     // Raspberry Pi's IP address hardcoded
 const int serverPort = 8080;                       // Servers Port Number  hardcoded
-const char* watch_code = "WZ501";
+const char* watch_code = "*";
 
 // Constructor
 Notification_sender::Notification_sender() {
