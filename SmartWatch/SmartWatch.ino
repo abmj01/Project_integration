@@ -20,17 +20,10 @@ Notify_user notify;
 Battery_monitoring battery(34);
 
 
-// Task Function declarations
-void readMPUTask(void *pvParameters);
-void handleUserInputTask(void *pvParameters);
-void updateDisplayTask(void *pvParameters);
-void getCurrentTimeTask(void *pvParameters);
-// void readBatteryTask(void *pvParameters);
-
 #define WDT_TIMEOUT 3
 
-const char* ssid = "TMNL-5A0F21";
-const char* password = "2043119Ggg";
+const char* ssid = "Odido-228CA6";
+const char* password = "9MRVRJHQHMKRDAJH";
 
 
 void setup() {
@@ -57,12 +50,9 @@ void setup() {
   mp.initialize_mpu();
 
  // Create FreeRTOS tasks
-  xTaskCreate(handleExerciseButtonTask, "ExerciseButtonTask", 8000, NULL, 2, NULL);
-  xTaskCreate(handleFallDetectionTask, "FallDetectionTask", 4096, NULL, 2, NULL);
-  xTaskCreate(handleDisplayTask, "DisplayTask", 8000, NULL, 1, NULL);
+  xTaskCreatePinnedToCore(handleFallDetectionTask, "FallDetectionTask", 4096, NULL, 2, NULL, 1);
+  xTaskCreate(handleDisplayTask, "DisplayTask", 12000, NULL, 1, NULL);
   xTaskCreate(getCurrentTimeTask, "GetCurrentTime", 2000, NULL, 1, NULL);
-  // xTaskCreate(readBatteryTask, "readBatteryTask", 400, NULL, 1, NULL);
-
 }
 
 
@@ -92,28 +82,6 @@ void loop() {
 }
 
 
-// Task for handling exercise button
-void handleExerciseButtonTask(void * parameter) {
-
-  UBaseType_t uxHighWaterMark;
-  uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-  while(true) {
-    user_input.handle_exercise_button();
-    check_exercise_mode();
-    check_exercise_mode_cancel();
-      // to stop the Excersice mode in the beginning
-    if (x == 0){
-    reset_flags_and_timers();
-    x++;
-    }
-
-    vTaskDelay(pdMS_TO_TICKS(10)); 
-
-   uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-  }
-}
-
-
 // Task for handling fall detection
 void handleFallDetectionTask(void * parameter) {
   UBaseType_t uxHighWaterMark;
@@ -131,6 +99,15 @@ void handleDisplayTask(void * parameter) {
   UBaseType_t uxHighWaterMark;
   uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
   while(true) {
+    user_input.handle_exercise_button();
+    check_exercise_mode();
+    check_exercise_mode_cancel();
+      // to stop the Excersice mode in the beginning
+    if (x == 0){
+    reset_flags_and_timers();
+    x++;
+    }
+
     battery.readBattery();
     oled.display_battery_status(battery.getBatteryVoltage(), battery.getBatteryPercentage());
     
@@ -165,17 +142,6 @@ UBaseType_t uxHighWaterMark;
   
 
 }
-
-// // Task for handling fall detection
-// void readBatteryTask(void * parameter) {
-//   UBaseType_t uxHighWaterMark;
-//   uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-//   while(true) {
-//     battery.readBattery();
-//     vTaskDelay(pdMS_TO_TICKS(3000)); 
-//     uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-//   }
-// }
 
 
 void check_exercise_mode(){
@@ -228,6 +194,7 @@ void handle_fall_detection() {
   }
 }
 
+bool send_alert_message_once = false;
 
 void handle_alert_sent() 
 {
@@ -244,6 +211,13 @@ void handle_alert_sent()
     notify.stop_buzzer();
     Serial.print(user_input.long_press_panic());
     if (alert_sent_start_time == 0) alert_sent_start_time = millis();
+
+    send_alert_message_once = true;
+
+    if(send_alert_message_once){
+      n_s.send_notification_to_contact_person(123784, 313123);
+      send_alert_message_once = false;
+    }
       
 
     oled.display_string("Alert sent!", 15, 75);
@@ -251,7 +225,6 @@ void handle_alert_sent()
 
     if ((millis() - alert_sent_start_time) > 5000ul) 
     { 
-      n_s.send_notification_to_contact_person(123784, 313123);
       initial_display_flag = true;
       reset_flags_and_timers();
     }
