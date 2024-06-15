@@ -3,11 +3,11 @@
 
 #include <WiFi.h>
 
-extern const char* ssid;
-extern const char* password;
-extern const char* serverAddress;
-extern const int serverPort;
-extern const char* watch_code;
+//192.168.137.176
+const char* serverAddress = "192.168.137.176";     // Raspberry Pi's IP address hardcoded
+const int serverPort = 8080;                       // Servers Port Number  hardcoded
+const char* watch_code = "WZ501";
+String full_name = "";
 
 class Notification_sender {
 private:
@@ -16,7 +16,7 @@ String waitForServerResponse();
 
 public:
     WiFiClient client;
-    String full_name = "";
+    
 
     Notification_sender();     //constructor
     void initialize_WiFi();

@@ -1,8 +1,5 @@
 #include "Notification_sender.h"
 
-const char* serverAddress = "192.168.137.176";     // Raspberry Pi's IP address hardcoded
-const int serverPort = 8080;                       // Servers Port Number  hardcoded
-const char* watch_code = "WZ501";
 
 // Constructor
 Notification_sender::Notification_sender() {

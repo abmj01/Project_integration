@@ -31,7 +31,7 @@ void setup() {
   
   n_s.initialize_WiFi();
 
-  // while(n_s.full_name == ""){
+  // while(full_name == ""){
   //   n_s.connect_to_server();
   // }
 
