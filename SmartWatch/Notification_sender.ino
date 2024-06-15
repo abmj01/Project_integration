@@ -41,7 +41,7 @@ void Notification_sender::send_notification_to_contact_person() {
         delay(100);
         return;
     }
-    String message = "1 The user " + full_name + " has had a seizure, Please open Smartguard application to see the location\n";
+    String message = "1 The user " + full_name + " has had a seizure, Please open the smartguard application to see the location.";
     client.print(message);
     Serial.println("Notification sent to contact person: " + message);
     String output = waitForServerResponse();
