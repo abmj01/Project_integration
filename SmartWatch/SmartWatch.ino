@@ -21,9 +21,9 @@ Battery_monitoring battery(34);
 
 
 #define WDT_TIMEOUT 3
-
-const char* ssid = "Odido-228CA6";
-const char* password = "9MRVRJHQHMKRDAJH";
+// Odido-228CA6
+const char* ssid = "AhmedLaptop";
+const char* password = "ahmed2001";
 
 
 void setup() {
@@ -31,9 +31,9 @@ void setup() {
   
   n_s.initialize_WiFi();
 
-  // while(full_name == ""){
-  //   n_s.connect_to_server();
-  // }
+// uncomment the following line if the server is running
+ n_s.connect_to_server();
+
 
   oled.initialize_ntp();        //ntp for curennt date and time
 
@@ -51,7 +51,7 @@ void setup() {
 
  // Create FreeRTOS tasks
   xTaskCreatePinnedToCore(handleFallDetectionTask, "FallDetectionTask", 4096, NULL, 2, NULL, 1);
-  xTaskCreate(handleDisplayTask, "DisplayTask", 12000, NULL, 1, NULL);
+  xTaskCreate(handleDisplayTask, "DisplayTask", 15000, NULL, 1, NULL);
   xTaskCreate(getCurrentTimeTask, "GetCurrentTime", 2000, NULL, 1, NULL);
 }
 
@@ -194,7 +194,6 @@ void handle_fall_detection() {
   }
 }
 
-bool send_alert_message_once = false;
 
 void handle_alert_sent() 
 {
@@ -212,19 +211,12 @@ void handle_alert_sent()
     Serial.print(user_input.long_press_panic());
     if (alert_sent_start_time == 0) alert_sent_start_time = millis();
 
-    send_alert_message_once = true;
-
-    if(send_alert_message_once){
-      n_s.send_notification_to_contact_person(123784, 313123);
-      send_alert_message_once = false;
-    }
-      
-
     oled.display_string("Alert sent!", 15, 75);
    
 
-    if ((millis() - alert_sent_start_time) > 5000ul) 
+    if ((millis() - alert_sent_start_time) > 3000ul) 
     { 
+      n_s.send_notification_to_contact_person();
       initial_display_flag = true;
       reset_flags_and_timers();
     }

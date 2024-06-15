@@ -35,13 +35,13 @@ void Notification_sender::connect_to_server() {
 }
 
 // Method to send notification to the contact person
-void Notification_sender::send_notification_to_contact_person(float longitude, float latitude) {
+void Notification_sender::send_notification_to_contact_person() {
     if (!client.connect(serverAddress, serverPort)) {
         Serial.println("Failed to connect to server!");
         delay(100);
         return;
     }
-    String message = "1 The user " + full_name + " has had a seizure in coordinates: Longitude: " + String(longitude, 6) + " Latitude: " + String(latitude, 6);
+    String message = "1 The user " + full_name + " has had a seizure, Please open Smartguard application to see the location\n";
     client.print(message);
     Serial.println("Notification sent to contact person: " + message);
     String output = waitForServerResponse();

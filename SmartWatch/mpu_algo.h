@@ -9,24 +9,23 @@
 Adafruit_MPU6050 mpu;
 
 
-class mpu_algo{
- private:
+class mpu_algo {
+private:
 
- const float accel_threshold = 31.00;
+  const float accel_threshold = 31.00;
 
- public:
- //defaut constructor
-  
- mpu_algo();
+public:
+  //defaut constructor
 
- const char* temperature;
+  mpu_algo();
 
- bool fall_detected = false;  //flag for fall detection
+  const char* temperature;
 
- void initialize_mpu();                  // initialize the mpu6050
- void readFall();                        // read the sensors and detect a fall
- void exercise_mode_fall_detection();    // excersidse mode algo
+  bool fall_detected = false;  //flag for fall detection
 
+  void initialize_mpu();                // initialize the mpu6050
+  void readFall();                      // read the sensors and detect a fall
+  void exercise_mode_fall_detection();  // excersidse mode algo
 };
 
 
