@@ -3,9 +3,9 @@ from twilio.rest import Client
 import DatabaseRetriever
 
 # Server configuration
-credentialsFile = 'smartguard-38b2d-3fab427b893d.json'  # example of file path
-loginSpreadsheetId = '1ECCL-Nr28LnLU-2ut3moZnOwGhVUlK7tOe4lue0S1K0'  # example. the ID can be taken from the link to the sheet, ex: https://docs.google.com/spreadsheets/d/<ID>/edit#gid=0
-contactPersonSpreadsheetId = '19luoGWYGi5rutMncAIWuV5WIfVZzsL6s7KDC6R8xBQ0'
+credentialsFile = 'xxxxxxx'  # example of file path
+loginSpreadsheetId = 'xxxxxxx'  # example. the ID can be taken from the link to the sheet, ex: https://docs.google.com/spreadsheets/d/<ID>/edit#gid=0
+contactPersonSpreadsheetId = 'xxxxxxx'
 
 HOST = '0.0.0.0'  # Use '0.0.0.0' to accept connections from any IP address
 PORT = 8080
