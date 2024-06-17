@@ -41,21 +41,10 @@ void Oled_display::display_string(const char* str, int x, int y) {
   u8g2.setFont(u8g2_font_ncenB08_tr);
 
 
-  if (full_name != "") {
-    int spaceIndex = full_name.indexOf(' ');
-
-    // Extract the first name
-    String first_name;
-    if (spaceIndex != -1) {
-      first_name = full_name.substring(0, spaceIndex);
-    } else {
-      first_name = full_name;  // If there is no space, use the whole name
-    }
-
-    String name_str = first_name + "'s watch";
-    const char* name = name_str.c_str();
-    u8g2.drawStr(0, 125, name);
-  }
+  String name_str = firstName + "'s watch";
+  const char* name = name_str.c_str();
+  u8g2.drawStr(0, 125, name);
+  
   display_battery_status(currentVoltage, currentPercentage);
   u8g2.sendBuffer();
 }
@@ -80,20 +69,11 @@ void Oled_display::display_long_string(const char* str1, const char* str2, int x
   u8g2.drawStr(x2, y2, str2);  // draw centered text
   u8g2.setFont(u8g2_font_ncenB08_tr);
 
-  if (full_name != "") {
-    // Extract the first name
-    int spaceIndex = full_name.indexOf(' ');
-    String first_name;
-    if (spaceIndex != -1) {
-      first_name = full_name.substring(0, spaceIndex);
-    } else {
-      first_name = full_name;  // If there is no space, use the whole name
-    }
 
-    String name_str = first_name + "'s watch";
-    const char* name = name_str.c_str();
-    u8g2.drawStr(0, 125, name);
-  }
+  String name_str = firstName + "'s watch";
+  const char* name = name_str.c_str();
+  u8g2.drawStr(0, 125, name);
+
   display_battery_status(currentVoltage, currentPercentage);
 
   u8g2.sendBuffer();

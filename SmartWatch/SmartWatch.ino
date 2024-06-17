@@ -7,7 +7,7 @@
 #include <esp_task_wdt.h>
 #include "Notification_sender.h"
 #include "Notify_user.h"
-#include "Battery_monitoring.h"
+#include "Battery_monitoring.h" 
 
 
 
@@ -194,6 +194,7 @@ void handle_fall_detection() {
   }
 }
 
+bool get_phone_number_once = true; 
 
 void handle_alert_sent() 
 {
@@ -212,10 +213,16 @@ void handle_alert_sent()
     if (alert_sent_start_time == 0) alert_sent_start_time = millis();
 
     oled.display_string("Alert sent!", 15, 75);
+
+    if (get_phone_number_once){
+      n_s.preload_contact_phonenr();
+      get_phone_number_once = false;
+    }
    
 
     if ((millis() - alert_sent_start_time) > 3000ul) 
     { 
+      get_phone_number_once = true;
       n_s.send_notification_to_contact_person();
       initial_display_flag = true;
       reset_flags_and_timers();
